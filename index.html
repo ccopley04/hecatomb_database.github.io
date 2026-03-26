@@ -2,12 +2,1864 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>HecatombDatabase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hecatomb — Endbringer's Compendium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #07060a;
+        --bg2: #0d0b12;
+        --surface: #120f1a;
+        --surface2: #1a1626;
+        --border: #251f35;
+        --border2: #352d4a;
+        --text: #d8cfe8;
+        --muted: #5a5270;
+
+        --corruption: #7fba5a;
+        --deceit: #4fa3d1;
+        --destruction: #c93030;
+        --greed: #c8a020;
+
+        --minion-c: #c06060;
+        --fate-c: #8888cc;
+        --relic-c: #88aa66;
+        --god-c: #d4a830;
+
+        --gold: #d8a050;
+        --radius: 8px;
+        --card-w: 205px;
+        --T: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Crimson Pro", Georgia, serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(
+            ellipse 80% 60% at 50% 0%,
+            rgba(100, 40, 180, 0.07) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 40% 30% at 10% 100%,
+            rgba(180, 30, 30, 0.04) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 40% 30% at 90% 80%,
+            rgba(30, 100, 180, 0.03) 0%,
+            transparent 60%
+          );
+      }
+
+      /* ── Header ── */
+      header {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 2.4rem 1rem 0;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(
+          to bottom,
+          rgba(20, 10, 30, 0.9),
+          transparent
+        );
+      }
+      .header-sigil {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 0.35rem;
+        filter: drop-shadow(0 0 10px rgba(180, 80, 80, 0.5));
+        animation: sigilPulse 4s ease-in-out infinite;
+      }
+      @keyframes sigilPulse {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 8px rgba(180, 80, 80, 0.4));
+        }
+        50% {
+          filter: drop-shadow(0 0 20px rgba(180, 80, 80, 0.7));
+        }
+      }
+      header h1 {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        color: var(--gold);
+        text-shadow:
+          0 0 30px rgba(200, 120, 20, 0.5),
+          0 2px 6px #000;
+        line-height: 1;
+      }
+      header .subtitle {
+        font-family: "IM Fell English", serif;
+        font-style: italic;
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 0.4rem;
+        letter-spacing: 0.06em;
+      }
+      .doom-bar {
+        display: flex;
+        height: 3px;
+        margin-top: 1rem;
+      }
+      .doom-bar span {
+        flex: 1;
+      }
+      .doom-bar span:nth-child(1) {
+        background: var(--corruption);
+      }
+      .doom-bar span:nth-child(2) {
+        background: var(--deceit);
+      }
+      .doom-bar span:nth-child(3) {
+        background: var(--destruction);
+      }
+      .doom-bar span:nth-child(4) {
+        background: var(--greed);
+      }
+
+      /* ── Stats bar ── */
+      #stats-bar {
+        display: none;
+        position: relative;
+        z-index: 1;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem 1.8rem;
+        background: rgba(13, 11, 18, 0.9);
+        border-bottom: 1px solid var(--border);
+      }
+      #stats-bar.visible {
+        display: flex;
+      }
+      .stat-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.38rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid var(--border2);
+        background: var(--surface2);
+        font-family: "IM Fell English", serif;
+        font-size: 0.76rem;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .stat-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .stat-pill.total {
+        color: var(--gold);
+        border-color: rgba(216, 160, 80, 0.3);
+      }
+      .sp-corruption .dot {
+        background: var(--corruption);
+      }
+      .sp-deceit .dot {
+        background: var(--deceit);
+      }
+      .sp-destruction .dot {
+        background: var(--destruction);
+      }
+      .sp-greed .dot {
+        background: var(--greed);
+      }
+      .sp-minion .dot {
+        background: var(--minion-c);
+      }
+      .sp-fate .dot {
+        background: var(--fate-c);
+      }
+      .sp-relic .dot {
+        background: var(--relic-c);
+      }
+      .sp-god .dot {
+        background: var(--god-c);
+      }
+
+      /* ── Controls ── */
+      #controls {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+        padding: 1rem 1.7rem;
+        background: rgba(13, 11, 18, 0.85);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .imp-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.44rem 1.05rem;
+        border: 1px solid rgba(216, 160, 80, 0.45);
+        border-radius: 4px;
+        background: rgba(216, 160, 80, 0.07);
+        color: var(--gold);
+        font-family: "IM Fell English", serif;
+        font-size: 0.8rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          background var(--T),
+          box-shadow var(--T);
+      }
+      .imp-label:hover {
+        background: rgba(216, 160, 80, 0.14);
+        box-shadow: 0 0 10px rgba(216, 160, 80, 0.18);
+      }
+      .imp-label input {
+        display: none;
+      }
+
+      .ctrl-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.38rem;
+        padding: 0.42rem 0.95rem;
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        background: var(--surface);
+        color: var(--muted);
+        font-family: "IM Fell English", serif;
+        font-size: 0.8rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          background var(--T),
+          color var(--T);
+      }
+      .ctrl-btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+
+      .search-wrap {
+        position: relative;
+      }
+      .search-wrap svg {
+        position: absolute;
+        left: 0.62rem;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.28;
+        pointer-events: none;
+      }
+      #search {
+        padding: 0.44rem 1rem 0.44rem 2.15rem;
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        color: var(--text);
+        font-family: "Crimson Pro", serif;
+        font-size: 0.98rem;
+        width: 198px;
+        outline: none;
+        transition:
+          border-color var(--T),
+          box-shadow var(--T);
+      }
+      #search::placeholder {
+        color: var(--muted);
+        font-style: italic;
+      }
+      #search:focus {
+        border-color: rgba(216, 160, 80, 0.45);
+        box-shadow: 0 0 8px rgba(216, 160, 80, 0.1);
+      }
+
+      select {
+        padding: 0.42rem 0.82rem;
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        color: var(--text);
+        font-family: "Crimson Pro", serif;
+        font-size: 0.93rem;
+        outline: none;
+        cursor: pointer;
+        transition: border-color var(--T);
+      }
+      select:focus {
+        border-color: rgba(216, 160, 80, 0.35);
+      }
+
+      /* Doom chips */
+      .doom-chips,
+      .type-chips {
+        display: flex;
+        gap: 0.28rem;
+        flex-wrap: wrap;
+      }
+      .doom-chip,
+      .type-chip {
+        display: flex;
+        align-items: center;
+        gap: 0.28rem;
+        padding: 0.26rem 0.6rem;
+        border-radius: 3px;
+        border: 1px solid var(--border2);
+        font-family: "IM Fell English", serif;
+        font-size: 0.74rem;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition:
+          background var(--T),
+          border-color var(--T),
+          opacity var(--T);
+        opacity: 0.5;
+      }
+      .doom-chip .swatch {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .doom-chip.active,
+      .type-chip.active {
+        opacity: 1;
+      }
+      .doom-chip[data-d="corruption"] {
+        color: var(--corruption);
+      }
+      .doom-chip[data-d="deceit"] {
+        color: var(--deceit);
+      }
+      .doom-chip[data-d="destruction"] {
+        color: var(--destruction);
+      }
+      .doom-chip[data-d="greed"] {
+        color: var(--greed);
+      }
+      .doom-chip[data-d="corruption"].active {
+        border-color: var(--corruption);
+        background: rgba(127, 186, 90, 0.08);
+      }
+      .doom-chip[data-d="deceit"].active {
+        border-color: var(--deceit);
+        background: rgba(79, 163, 209, 0.08);
+      }
+      .doom-chip[data-d="destruction"].active {
+        border-color: var(--destruction);
+        background: rgba(201, 48, 48, 0.09);
+      }
+      .doom-chip[data-d="greed"].active {
+        border-color: var(--greed);
+        background: rgba(200, 160, 32, 0.08);
+      }
+
+      .type-chip {
+        color: var(--muted);
+      }
+      .type-chip[data-t="Minion"].active {
+        color: var(--minion-c);
+        border-color: var(--minion-c);
+        background: rgba(192, 96, 96, 0.09);
+      }
+      .type-chip[data-t="Fate"].active {
+        color: var(--fate-c);
+        border-color: var(--fate-c);
+        background: rgba(136, 136, 204, 0.09);
+      }
+      .type-chip[data-t="Relic"].active {
+        color: var(--relic-c);
+        border-color: var(--relic-c);
+        background: rgba(136, 170, 102, 0.09);
+      }
+      .type-chip[data-t="God"].active {
+        color: var(--god-c);
+        border-color: var(--god-c);
+        background: rgba(212, 168, 48, 0.09);
+      }
+
+      /* Range sliders */
+      .range-group {
+        display: flex;
+        align-items: center;
+        gap: 0.38rem;
+      }
+      .range-group label {
+        font-size: 0.74rem;
+        color: var(--muted);
+        white-space: nowrap;
+        font-family: "IM Fell English", serif;
+      }
+      .range-group input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 78px;
+        height: 3px;
+        background: var(--border2);
+        border-radius: 2px;
+        outline: none;
+        cursor: pointer;
+      }
+      .range-group input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--gold);
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(216, 160, 80, 0.35);
+      }
+      .range-val {
+        min-width: 20px;
+        text-align: center;
+        font-family: "IM Fell English", serif;
+        font-size: 0.7rem;
+        color: var(--gold);
+      }
+
+      .view-toggle {
+        display: flex;
+        gap: 0.22rem;
+      }
+      .view-btn {
+        padding: 0.38rem 0.56rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition:
+          background var(--T),
+          color var(--T),
+          border-color var(--T);
+      }
+      .view-btn.active {
+        background: var(--surface2);
+        border-color: rgba(216, 160, 80, 0.35);
+        color: var(--gold);
+      }
+
+      .group-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.38rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .tog {
+        position: relative;
+        width: 31px;
+        height: 16px;
+        cursor: pointer;
+      }
+      .tog input {
+        display: none;
+      }
+      .tog-track {
+        position: absolute;
+        inset: 0;
+        background: var(--border2);
+        border-radius: 8px;
+        transition: background var(--T);
+      }
+      .tog-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--muted);
+        transition:
+          transform var(--T),
+          background var(--T);
+      }
+      .tog input:checked ~ .tog-track {
+        background: rgba(216, 160, 80, 0.28);
+      }
+      .tog input:checked ~ .tog-thumb {
+        transform: translateX(15px);
+        background: var(--gold);
+      }
+
+      #card-count {
+        color: var(--muted);
+        font-style: italic;
+        font-size: 0.83rem;
+        white-space: nowrap;
+        font-family: "IM Fell English", serif;
+      }
+
+      /* ── Drop Zone ── */
+      #drop-zone {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(7, 6, 10, 0.93);
+        backdrop-filter: blur(10px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1rem;
+        border: 2px dashed rgba(216, 160, 80, 0.4);
+        pointer-events: none;
+      }
+      #drop-zone.active {
+        display: flex;
+        pointer-events: all;
+      }
+      #drop-zone .di {
+        font-size: 3.2rem;
+      }
+      #drop-zone p {
+        font-family: "UnifrakturMaguntia", serif;
+        color: var(--gold);
+        font-size: 1.3rem;
+        text-shadow: 0 0 18px rgba(216, 160, 80, 0.4);
+      }
+
+      /* ── Layout ── */
+      #main-layout {
+        display: flex;
+        position: relative;
+        z-index: 1;
+      }
+      #gallery-wrap {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .group-header {
+        grid-column: 1 / -1;
+        font-family: "IM Fell English", serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.45rem 0 0.22rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 0.2rem;
+      }
+      .gh-corruption {
+        color: var(--corruption);
+        border-color: rgba(127, 186, 90, 0.28);
+      }
+      .gh-deceit {
+        color: var(--deceit);
+        border-color: rgba(79, 163, 209, 0.28);
+      }
+      .gh-destruction {
+        color: var(--destruction);
+        border-color: rgba(201, 48, 48, 0.28);
+      }
+      .gh-greed {
+        color: var(--greed);
+        border-color: rgba(200, 160, 32, 0.28);
+      }
+      .gh-neutral {
+        color: var(--muted);
+      }
+
+      #gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr));
+        gap: 1.5rem;
+        padding: 2rem clamp(1rem, 3vw, 2.2rem) 4rem;
+      }
+      #gallery.list-view {
+        grid-template-columns: 1fr;
+        gap: 0.42rem;
+        padding: 1.1rem clamp(1rem, 3vw, 2.2rem) 3rem;
+      }
+
+      .state-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 5rem 1rem;
+        color: var(--muted);
+      }
+      .state-message .sigil {
+        font-size: 2.6rem;
+        margin-bottom: 0.75rem;
+        filter: drop-shadow(0 0 10px rgba(180, 80, 80, 0.3));
+      }
+      .state-message h2 {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 1.15rem;
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+      }
+      .state-message p {
+        font-family: "IM Fell English", serif;
+        font-style: italic;
+        font-size: 0.9rem;
+        line-height: 1.65;
+      }
+
+      /* ── Card ── */
+      .card {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        clip-path: polygon(18px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 18px);
+        cursor: pointer;
+        outline: none;
+        transition:
+          transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.25s,
+          border-color 0.25s;
+        animation: cardIn 0.35s ease both;
+      }
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(13px) scale(0.94);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .card:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+      }
+      .card:hover {
+        transform: translateY(-5px) scale(1.023);
+      }
+
+      .card[data-doom="corruption"]:hover {
+        box-shadow: 0 12px 30px rgba(127, 186, 90, 0.25);
+        border-color: rgba(127, 186, 90, 0.35);
+      }
+      .card[data-doom="deceit"]:hover {
+        box-shadow: 0 12px 30px rgba(79, 163, 209, 0.25);
+        border-color: rgba(79, 163, 209, 0.35);
+      }
+      .card[data-doom="destruction"]:hover {
+        box-shadow: 0 12px 30px rgba(201, 48, 48, 0.32);
+        border-color: rgba(201, 48, 48, 0.45);
+      }
+      .card[data-doom="greed"]:hover {
+        box-shadow: 0 12px 30px rgba(200, 160, 32, 0.28);
+        border-color: rgba(200, 160, 32, 0.38);
+      }
+      .card[data-ctype="God"]:hover {
+        box-shadow: 0 14px 34px rgba(212, 168, 48, 0.42);
+        border-color: rgba(212, 168, 48, 0.5);
+      }
+
+      /* doom top bar */
+      .card-topbar {
+        position: absolute;
+        top: 0;
+        left: 18px;
+        right: 0;
+        height: 3px;
+        z-index: 1;
+      }
+      .card[data-doom="corruption"] .card-topbar {
+        background: var(--corruption);
+      }
+      .card[data-doom="deceit"] .card-topbar {
+        background: var(--deceit);
+      }
+      .card[data-doom="destruction"] .card-topbar {
+        background: var(--destruction);
+      }
+      .card[data-doom="greed"] .card-topbar {
+        background: var(--greed);
+      }
+
+      /* pentagon cut corner */
+      .card-corner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 22px;
+        height: 22px;
+        z-index: 2;
+        background: linear-gradient(135deg, var(--bg) 50%, transparent 50%);
+        pointer-events: none;
+      }
+
+      .card-art {
+        width: 100%;
+        height: 128px;
+        object-fit: cover;
+        display: block;
+        background: #0f0d18;
+      }
+      .card-art-placeholder {
+        width: 100%;
+        height: 128px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+      }
+      .card[data-doom="corruption"] .card-art-placeholder {
+        background: linear-gradient(135deg, #0d1510, #090d0a);
+      }
+      .card[data-doom="deceit"] .card-art-placeholder {
+        background: linear-gradient(135deg, #0b1218, #080c11);
+      }
+      .card[data-doom="destruction"] .card-art-placeholder {
+        background: linear-gradient(135deg, #150909, #0e0606);
+      }
+      .card[data-doom="greed"] .card-art-placeholder {
+        background: linear-gradient(135deg, #141108, #0e0c05);
+      }
+      .card[data-ctype="God"] .card-art-placeholder {
+        background: linear-gradient(135deg, #1a1408, #120e05);
+      }
+
+      .card-body {
+        padding: 0.58rem 0.78rem 0.72rem;
+      }
+
+      .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.28rem;
+        margin-bottom: 0.1rem;
+      }
+      .card-name {
+        font-family: "IM Fell English", serif;
+        font-size: 0.8rem;
+        color: #e0d4b0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+      }
+      .card-cost {
+        font-family: "IM Fell English", serif;
+        font-size: 0.66rem;
+        background: rgba(216, 160, 80, 0.1);
+        border: 1px solid rgba(216, 160, 80, 0.38);
+        color: var(--gold);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-bottom: 0.28rem;
+        flex-wrap: wrap;
+      }
+      .card-type-badge {
+        font-family: "IM Fell English", serif;
+        font-size: 0.66rem;
+        padding: 1px 4px;
+        border-radius: 2px;
+        border: 1px solid;
+      }
+      .card-type-badge.Minion {
+        color: var(--minion-c);
+        border-color: rgba(192, 96, 96, 0.38);
+        background: rgba(192, 96, 96, 0.07);
+      }
+      .card-type-badge.Fate {
+        color: var(--fate-c);
+        border-color: rgba(136, 136, 204, 0.38);
+        background: rgba(136, 136, 204, 0.07);
+      }
+      .card-type-badge.Relic {
+        color: var(--relic-c);
+        border-color: rgba(136, 170, 102, 0.38);
+        background: rgba(136, 170, 102, 0.07);
+      }
+      .card-type-badge.God {
+        color: var(--god-c);
+        border-color: rgba(212, 168, 48, 0.38);
+        background: rgba(212, 168, 48, 0.07);
+      }
+
+      .card-subtype {
+        font-size: 0.7rem;
+        color: var(--muted);
+        font-style: italic;
+      }
+      .card-doom-badge {
+        font-size: 0.6rem;
+        font-family: "IM Fell English", serif;
+        padding: 1px 4px;
+        border-radius: 2px;
+        margin-left: auto;
+      }
+      .card-doom-badge.corruption {
+        color: var(--corruption);
+        background: rgba(127, 186, 90, 0.09);
+      }
+      .card-doom-badge.deceit {
+        color: var(--deceit);
+        background: rgba(79, 163, 209, 0.09);
+      }
+      .card-doom-badge.destruction {
+        color: var(--destruction);
+        background: rgba(201, 48, 48, 0.09);
+      }
+      .card-doom-badge.greed {
+        color: var(--greed);
+        background: rgba(200, 160, 32, 0.09);
+      }
+
+      .card-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+        margin: 0.32rem 0;
+      }
+      .card-text {
+        font-size: 0.76rem;
+        color: #7870a0;
+        line-height: 1.4;
+        font-style: italic;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .card-bottom {
+        display: flex;
+        align-items: center;
+        margin-top: 0.42rem;
+        padding-top: 0.32rem;
+        border-top: 1px solid var(--border);
+        gap: 0.5rem;
+      }
+      .strength-label {
+        font-size: 0.6rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: "IM Fell English", serif;
+      }
+      .strength-val {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 0.98rem;
+        line-height: 1;
+        color: var(--gold);
+        text-shadow: 0 0 7px rgba(216, 160, 80, 0.35);
+      }
+      .set-label {
+        font-size: 0.6rem;
+        color: var(--muted);
+        font-style: italic;
+        margin-left: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+      }
+
+      .deck-add-btn {
+        position: absolute;
+        bottom: 0.42rem;
+        right: 0.42rem;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        background: rgba(216, 160, 80, 0.1);
+        border: 1px solid rgba(216, 160, 80, 0.38);
+        color: var(--gold);
+        font-size: 0.82rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        z-index: 3;
+        transition:
+          opacity 0.15s,
+          background 0.15s,
+          transform 0.15s;
+      }
+      .card:hover .deck-add-btn {
+        opacity: 1;
+      }
+      .deck-add-btn:hover {
+        background: rgba(216, 160, 80, 0.26);
+        transform: scale(1.15);
+      }
+
+      /* ── List view ── */
+      .card.list-card {
+        display: flex;
+        align-items: center;
+        clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 10px);
+        transform: none !important;
+      }
+      .card.list-card:hover {
+        transform: translateX(4px) !important;
+      }
+      .card.list-card .card-art,
+      .card.list-card .card-art-placeholder {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+      }
+      .card.list-card .card-art-placeholder {
+        font-size: 1.25rem;
+      }
+      .card.list-card .card-body {
+        flex: 1;
+        padding: 0.38rem 0.72rem;
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        flex-wrap: wrap;
+      }
+      .card.list-card .card-name {
+        font-size: 0.76rem;
+        max-width: 190px;
+      }
+      .card.list-card .card-meta {
+        margin: 0;
+      }
+      .card.list-card .card-divider,
+      .card.list-card .card-text,
+      .card.list-card .card-bottom {
+        display: none;
+      }
+      .card.list-card .card-cost {
+        margin-left: auto;
+      }
+      .card.list-card .deck-add-btn {
+        bottom: 0.28rem;
+        right: 2.1rem;
+      }
+
+      /* ── Deck Panel ── */
+      #deck-panel {
+        width: 272px;
+        flex-shrink: 0;
+        background: var(--surface);
+        border-left: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: hidden;
+        transition:
+          width var(--T),
+          opacity var(--T);
+      }
+      #deck-panel.collapsed {
+        width: 0;
+        opacity: 0;
+        pointer-events: none;
+        border: none;
+      }
+
+      .deck-header {
+        padding: 0.85rem 1.05rem 0.65rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .deck-header h3 {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 0.82rem;
+        color: var(--gold);
+        flex: 1;
+        letter-spacing: 0.04em;
+      }
+      .deck-hcount {
+        font-family: "IM Fell English", serif;
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+      .deck-clear-btn {
+        font-size: 0.68rem;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 0.16rem 0.42rem;
+        cursor: pointer;
+        font-family: "Crimson Pro", serif;
+        transition:
+          color var(--T),
+          border-color var(--T);
+      }
+      .deck-clear-btn:hover {
+        color: var(--destruction);
+        border-color: var(--destruction);
+      }
+
+      #deck-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.45rem 0.65rem;
+      }
+      #deck-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      #deck-list::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 2px;
+      }
+
+      .deck-empty {
+        text-align: center;
+        padding: 1.6rem 0.5rem;
+        color: var(--muted);
+        font-style: italic;
+        font-family: "IM Fell English", serif;
+        font-size: 0.83rem;
+      }
+
+      .deck-entry {
+        display: flex;
+        align-items: center;
+        gap: 0.48rem;
+        padding: 0.32rem 0.42rem;
+        border-radius: 3px;
+        border: 1px solid transparent;
+        transition: background var(--T);
+        animation: cardIn 0.2s ease both;
+      }
+      .deck-entry:hover {
+        background: var(--surface2);
+        border-color: var(--border);
+      }
+      .deck-entry-emoji {
+        font-size: 0.95rem;
+        flex-shrink: 0;
+      }
+      .deck-entry-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .deck-entry-name {
+        font-size: 0.76rem;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: "IM Fell English", serif;
+      }
+      .deck-entry-sub {
+        font-size: 0.66rem;
+        color: var(--muted);
+        font-style: italic;
+      }
+      .deck-count-ctrl {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        flex-shrink: 0;
+      }
+      .deck-count-ctrl button {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--surface2);
+        border: 1px solid var(--border2);
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background var(--T),
+          color var(--T);
+      }
+      .deck-count-ctrl button:hover {
+        background: var(--border2);
+        color: var(--text);
+      }
+      .deck-count-num {
+        font-family: "IM Fell English", serif;
+        font-size: 0.68rem;
+        color: var(--gold);
+        min-width: 12px;
+        text-align: center;
+      }
+
+      .deck-footer {
+        padding: 0.65rem 0.85rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 0.38rem;
+      }
+      .deck-exp-btn {
+        padding: 0.44rem;
+        border-radius: 4px;
+        background: rgba(216, 160, 80, 0.07);
+        border: 1px solid rgba(216, 160, 80, 0.32);
+        color: var(--gold);
+        font-family: "IM Fell English", serif;
+        font-size: 0.74rem;
+        cursor: pointer;
+        text-align: center;
+        transition: background var(--T);
+      }
+      .deck-exp-btn:hover {
+        background: rgba(216, 160, 80, 0.16);
+      }
+
+      #deck-toggle {
+        position: fixed;
+        right: 1.1rem;
+        bottom: 1.4rem;
+        z-index: 50;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--surface2);
+        border: 1px solid rgba(216, 160, 80, 0.38);
+        color: var(--gold);
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+        transition:
+          background var(--T),
+          transform var(--T);
+      }
+      #deck-toggle:hover {
+        background: rgba(216, 160, 80, 0.1);
+        transform: scale(1.08);
+      }
+      .deck-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: var(--destruction);
+        color: #fff;
+        font-family: "IM Fell English", serif;
+        font-size: 0.56rem;
+        border-radius: 8px;
+        padding: 1px 4px;
+        min-width: 15px;
+        text-align: center;
+        display: none;
+      }
+      .deck-badge.visible {
+        display: block;
+      }
+
+      /* ── Modal ── */
+      #modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 6, 10, 0.88);
+        backdrop-filter: blur(8px);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      #modal-overlay.open {
+        display: flex;
+      }
+
+      #modal {
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        max-width: 400px;
+        width: 100%;
+        overflow: hidden;
+        animation: modalIn 0.27s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        clip-path: polygon(26px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 26px);
+      }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: scale(0.87) translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      #modal[data-doom="corruption"] {
+        border-color: rgba(127, 186, 90, 0.38);
+      }
+      #modal[data-doom="deceit"] {
+        border-color: rgba(79, 163, 209, 0.38);
+      }
+      #modal[data-doom="destruction"] {
+        border-color: rgba(201, 48, 48, 0.45);
+      }
+      #modal[data-doom="greed"] {
+        border-color: rgba(200, 160, 32, 0.38);
+      }
+
+      #modal-topbar {
+        height: 3px;
+        width: 100%;
+      }
+      #modal[data-doom="corruption"] #modal-topbar {
+        background: var(--corruption);
+      }
+      #modal[data-doom="deceit"] #modal-topbar {
+        background: var(--deceit);
+      }
+      #modal[data-doom="destruction"] #modal-topbar {
+        background: var(--destruction);
+      }
+      #modal[data-doom="greed"] #modal-topbar {
+        background: var(--greed);
+      }
+      #modal[data-ctype="God"] #modal-topbar {
+        background: linear-gradient(90deg, var(--greed), #fde68a, var(--greed));
+      }
+
+      #modal-close {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.78rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        z-index: 5;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      #modal-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+
+      #modal-art {
+        width: 100%;
+        height: 195px;
+        object-fit: cover;
+        background: #0f0d18;
+      }
+      #modal-art-ph {
+        width: 100%;
+        height: 195px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
+      }
+
+      #modal-body {
+        padding: 1.05rem 1.35rem 1.35rem;
+      }
+      #modal-name {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 1.15rem;
+        color: #e0d4b0;
+        margin-bottom: 0.14rem;
+      }
+      #modal-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.6rem;
+        flex-wrap: wrap;
+      }
+      #modal-desc {
+        color: #7870a0;
+        font-size: 0.88rem;
+        line-height: 1.56;
+        font-style: italic;
+        margin-bottom: 0.5rem;
+      }
+      #modal-abilities {
+        color: var(--text);
+        font-size: 0.88rem;
+        line-height: 1.56;
+        margin-bottom: 0.78rem;
+      }
+
+      #modal-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        padding: 0.6rem 0.85rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 5px;
+        border: 1px solid var(--border);
+        margin-bottom: 0.72rem;
+      }
+      .m-stat {
+        text-align: center;
+      }
+      .m-stat label {
+        display: block;
+        font-size: 0.58rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 2px;
+        font-family: "IM Fell English", serif;
+      }
+      .m-stat span {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 0.92rem;
+        color: var(--gold);
+      }
+
+      #modal-extra {
+        font-size: 0.76rem;
+        color: var(--muted);
+        font-style: italic;
+        margin-bottom: 0.78rem;
+        line-height: 1.5;
+      }
+      #modal-extra span {
+        color: var(--text);
+      }
+
+      #modal-deck-btn {
+        width: 100%;
+        padding: 0.48rem;
+        background: rgba(216, 160, 80, 0.08);
+        border: 1px solid rgba(216, 160, 80, 0.38);
+        color: var(--gold);
+        font-family: "IM Fell English", serif;
+        font-size: 0.78rem;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+        transition: background var(--T);
+      }
+      #modal-deck-btn:hover {
+        background: rgba(216, 160, 80, 0.16);
+      }
+
+      /* ── Form ── */
+      #form-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 6, 10, 0.9);
+        backdrop-filter: blur(10px);
+        z-index: 110;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+      #form-overlay.open {
+        display: flex;
+      }
+
+      #card-form {
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        max-width: 480px;
+        width: 100%;
+        padding: 1.6rem;
+        animation: modalIn 0.27s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+      }
+      #card-form h2 {
+        font-family: "UnifrakturMaguntia", serif;
+        font-size: 0.95rem;
+        color: var(--gold);
+        margin-bottom: 1rem;
+        letter-spacing: 0.04em;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+      }
+      .form-grid .full {
+        grid-column: 1 / -1;
+      }
+      .ff {
+        display: flex;
+        flex-direction: column;
+        gap: 0.26rem;
+      }
+      .ff label {
+        font-size: 0.66rem;
+        color: var(--muted);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-family: "IM Fell English", serif;
+      }
+      .ff input,
+      .ff select,
+      .ff textarea {
+        padding: 0.44rem 0.68rem;
+        background: var(--surface2);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        color: var(--text);
+        font-family: "Crimson Pro", serif;
+        font-size: 0.93rem;
+        outline: none;
+        transition: border-color var(--T);
+      }
+      .ff input:focus,
+      .ff select:focus,
+      .ff textarea:focus {
+        border-color: rgba(216, 160, 80, 0.42);
+      }
+      .ff textarea {
+        resize: vertical;
+        min-height: 62px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 0.48rem;
+        margin-top: 1rem;
+      }
+      .fbtn {
+        flex: 1;
+        padding: 0.48rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: "IM Fell English", serif;
+        font-size: 0.76rem;
+        border: 1px solid var(--border2);
+        color: var(--muted);
+        background: var(--surface2);
+        transition:
+          background var(--T),
+          color var(--T);
+      }
+      .fbtn:hover {
+        background: var(--border2);
+        color: var(--text);
+      }
+      .fbtn.primary {
+        background: rgba(216, 160, 80, 0.09);
+        border-color: rgba(216, 160, 80, 0.38);
+        color: var(--gold);
+      }
+      .fbtn.primary:hover {
+        background: rgba(216, 160, 80, 0.18);
+      }
+      #form-close {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.85rem;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed;
+        bottom: 5rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: var(--surface2);
+        border: 1px solid var(--border2);
+        color: var(--text);
+        font-family: "IM Fell English", serif;
+        font-style: italic;
+        font-size: 0.83rem;
+        padding: 0.48rem 1.25rem;
+        border-radius: 20px;
+        pointer-events: none;
+        opacity: 0;
+        transition:
+          opacity 0.22s,
+          transform 0.22s;
+        z-index: 300;
+        white-space: nowrap;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 640px) {
+        :root {
+          --card-w: 152px;
+        }
+        #gallery {
+          gap: 0.9rem;
+        }
+        #controls {
+          padding: 0.75rem 0.85rem;
+        }
+        #deck-panel {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="cardGallery"></div>
-    <button id="addButton">Add Item!</button
-    ><input id="inputItem" type="text" placeholder="Enter Item!" />
-    <script src="./Scripts/CardObjectFactory.js"></script>
+    <div id="drop-zone">
+      <div class="di">📜</div>
+      <p>Drop CSV to Summon Cards</p>
+    </div>
+
+    <header>
+      <span class="header-sigil">☽⛧☾</span>
+      <h1>Hecatomb</h1>
+      <p class="subtitle">
+        Endbringer's Compendium — Base Set · Last Hallow's Eve · Blanket of Lies
+      </p>
+      <div class="doom-bar">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </header>
+
+    <div id="stats-bar">
+      <div class="stat-pill total" id="stat-total">0 Cards</div>
+      <div class="stat-pill sp-corruption">
+        <span class="dot"></span><span id="sn-c">0</span> Corruption
+      </div>
+      <div class="stat-pill sp-deceit">
+        <span class="dot"></span><span id="sn-d">0</span> Deceit
+      </div>
+      <div class="stat-pill sp-destruction">
+        <span class="dot"></span><span id="sn-x">0</span> Destruction
+      </div>
+      <div class="stat-pill sp-greed">
+        <span class="dot"></span><span id="sn-g">0</span> Greed
+      </div>
+      <div class="stat-pill sp-minion">
+        <span class="dot"></span><span id="sn-m">0</span> Minions
+      </div>
+      <div class="stat-pill sp-fate">
+        <span class="dot"></span><span id="sn-f">0</span> Fates
+      </div>
+      <div class="stat-pill sp-relic">
+        <span class="dot"></span><span id="sn-r">0</span> Relics
+      </div>
+      <div class="stat-pill sp-god">
+        <span class="dot"></span><span id="sn-go">0</span> Gods
+      </div>
+    </div>
+
+    <div id="controls">
+      <label class="imp-label"
+        >⛧ Import CSV<input type="file" id="csv-input" accept=".csv" multiple
+      /></label>
+      <button class="ctrl-btn" id="add-card-btn">＋ Add Card</button>
+
+      <div class="search-wrap">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search name, subtype, text…"
+        />
+      </div>
+
+      <div class="doom-chips">
+        <div class="doom-chip active" data-d="corruption">
+          <span class="swatch" style="background: var(--corruption)"></span
+          >Corruption
+        </div>
+        <div class="doom-chip active" data-d="deceit">
+          <span class="swatch" style="background: var(--deceit)"></span>Deceit
+        </div>
+        <div class="doom-chip active" data-d="destruction">
+          <span class="swatch" style="background: var(--destruction)"></span
+          >Destruction
+        </div>
+        <div class="doom-chip active" data-d="greed">
+          <span class="swatch" style="background: var(--greed)"></span>Greed
+        </div>
+      </div>
+
+      <div class="type-chips">
+        <div class="type-chip active" data-t="Minion">Minion</div>
+        <div class="type-chip active" data-t="Fate">Fate</div>
+        <div class="type-chip active" data-t="Relic">Relic</div>
+        <div class="type-chip active" data-t="God">God</div>
+      </div>
+
+      <select id="filter-set">
+        <option value="">All Sets</option>
+      </select>
+
+      <select id="sort-by">
+        <option value="name-asc">Name A→Z</option>
+        <option value="name-desc">Name Z→A</option>
+        <option value="cost-asc">Cost Low→High</option>
+        <option value="cost-desc">Cost High→Low</option>
+        <option value="strength-desc">Strength High→Low</option>
+        <option value="doom-asc">Doom</option>
+        <option value="type-asc">Card Type</option>
+      </select>
+
+      <div class="range-group">
+        <label>Strength ≥</label>
+        <input type="range" id="range-str" min="0" max="20" value="0" />
+        <span class="range-val" id="range-str-val">Any</span>
+      </div>
+
+      <div class="range-group">
+        <label>Cost ≥</label>
+        <input type="range" id="range-cost" min="0" max="10" value="0" />
+        <span class="range-val" id="range-cost-val">Any</span>
+      </div>
+
+      <div class="group-wrap">
+        <label class="tog">
+          <input type="checkbox" id="group-toggle" />
+          <div class="tog-track"></div>
+          <div class="tog-thumb"></div>
+        </label>
+        <span>Group</span>
+        <select
+          id="group-by"
+          style="padding: 0.28rem 0.55rem; font-size: 0.78rem"
+        >
+          <option value="doom">by Doom</option>
+          <option value="type">by Type</option>
+          <option value="set">by Set</option>
+        </select>
+      </div>
+
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-grid" title="Grid">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="0" y="0" width="6" height="6" rx="1" />
+            <rect x="10" y="0" width="6" height="6" rx="1" />
+            <rect x="0" y="10" width="6" height="6" rx="1" />
+            <rect x="10" y="10" width="6" height="6" rx="1" />
+          </svg>
+        </button>
+        <button class="view-btn" id="view-list" title="List">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="0" y="1" width="16" height="3" rx="1" />
+            <rect x="0" y="7" width="16" height="3" rx="1" />
+            <rect x="0" y="13" width="16" height="3" rx="1" />
+          </svg>
+        </button>
+      </div>
+
+      <button class="ctrl-btn" id="export-btn">↓ Export CSV</button>
+      <span id="card-count"></span>
+    </div>
+
+    <div id="main-layout">
+      <div id="gallery-wrap">
+        <div id="gallery">
+          <div class="state-message">
+            <div class="sigil">☽⛧☾</div>
+            <h2>The Apocalypse Awaits</h2>
+            <p>
+              Import a CSV of your Hecatomb collection to begin.<br />
+              Expected columns:
+              <em
+                >name, type, doom, cost, strength, subtype, set, abilities,
+                flavor, image</em
+              ><br />
+              Or drag &amp; drop a CSV file anywhere on the page.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="deck-panel" class="collapsed">
+        <div class="deck-header">
+          <h3>Deck Builder</h3>
+          <span class="deck-hcount" id="deck-hcount">0 cards</span>
+          <button class="deck-clear-btn" id="deck-clear">Destroy</button>
+        </div>
+        <div id="deck-list">
+          <div class="deck-empty">Add cards to build your deck</div>
+        </div>
+        <div class="deck-footer">
+          <button class="deck-exp-btn" id="deck-export-csv">
+            Export Deck as CSV
+          </button>
+          <button class="deck-exp-btn" id="deck-export-txt">
+            Export Deck as Text List
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button id="deck-toggle" title="Toggle Deck Builder">
+      🗡
+      <span class="deck-badge" id="deck-badge">0</span>
+    </button>
+
+    <!-- Card detail modal -->
+    <div id="modal-overlay">
+      <div id="modal">
+        <div id="modal-topbar"></div>
+        <button id="modal-close">✕</button>
+        <div id="modal-art-ph"></div>
+        <img id="modal-art" src="" alt="" style="display: none" />
+        <div id="modal-body">
+          <div id="modal-name"></div>
+          <div id="modal-meta"></div>
+          <div id="modal-desc"></div>
+          <div id="modal-abilities"></div>
+          <div id="modal-stats"></div>
+          <div id="modal-extra"></div>
+          <button id="modal-deck-btn">⛧ Add to Deck</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit form -->
+    <div id="form-overlay">
+      <div id="card-form">
+        <button id="form-close">✕</button>
+        <h2 id="form-title">⛧ Summon New Card</h2>
+        <div class="form-grid">
+          <div class="ff full">
+            <label>Name *</label
+            ><input type="text" id="f-name" placeholder="e.g. Great Cthulhu" />
+          </div>
+          <div class="ff">
+            <label>Type</label>
+            <select id="f-type">
+              <option value="Minion">Minion</option>
+              <option value="Fate">Fate</option>
+              <option value="Relic">Relic</option>
+              <option value="God">God</option>
+            </select>
+          </div>
+          <div class="ff">
+            <label>Doom</label>
+            <select id="f-doom">
+              <option value="corruption">Corruption</option>
+              <option value="deceit">Deceit</option>
+              <option value="destruction">Destruction</option>
+              <option value="greed">Greed</option>
+            </select>
+          </div>
+          <div class="ff">
+            <label>Cost (Mana)</label
+            ><input type="number" id="f-cost" min="0" placeholder="1" />
+          </div>
+          <div class="ff">
+            <label>Strength</label
+            ><input type="number" id="f-strength" min="0" placeholder="—" />
+          </div>
+          <div class="ff">
+            <label>Subtype</label
+            ><input
+              type="text"
+              id="f-subtype"
+              placeholder="e.g. Beast, Cultist…"
+            />
+          </div>
+          <div class="ff">
+            <label>Set</label>
+            <select id="f-set">
+              <option value="Base Set">Base Set</option>
+              <option value="Last Hallow's Eve">Last Hallow's Eve</option>
+              <option value="Blanket of Lies">Blanket of Lies</option>
+              <option value="Promo">Promo</option>
+            </select>
+          </div>
+          <div class="ff">
+            <label>Emoji (art)</label
+            ><input type="text" id="f-emoji" placeholder="👹" />
+          </div>
+          <div class="ff full">
+            <label>Image URL</label
+            ><input type="text" id="f-image" placeholder="https://…" />
+          </div>
+          <div class="ff full">
+            <label>Abilities</label
+            ><textarea
+              id="f-abilities"
+              placeholder="Card ability text…"
+            ></textarea>
+          </div>
+          <div class="ff full">
+            <label>Flavor Text</label
+            ><textarea
+              id="f-flavor"
+              placeholder="Flavor / lore text…"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="fbtn" id="form-cancel">Cancel</button>
+          <button class="fbtn primary" id="form-save">Summon</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+    <script src="Scripts/gallery.js"></script>
   </body>
 </html>
