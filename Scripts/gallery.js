@@ -814,6 +814,16 @@
   /* ══════════════════════════════════════════
      CSV IMPORT
   ══════════════════════════════════════════ */
+  // True when the gallery still shows the built-in defaults
+  // (nothing has been saved to localStorage yet).
+  function isUsingDefaults() {
+    try {
+      return !localStorage.getItem("hcg_collection");
+    } catch (_) {
+      return true;
+    }
+  }
+
   function importText(text, filename) {
     const { cards, warnings } = parseCSV(text);
     if (!cards.length) {
@@ -821,7 +831,8 @@
       return;
     }
 
-    allCards = [...allCards, ...cards];
+    // First real import replaces defaults; subsequent imports merge.
+    allCards = isUsingDefaults() ? cards : [...allCards, ...cards];
     saveCollection();
     populateSetFilter();
     updateRangeMaxima();
@@ -1079,45 +1090,58 @@
   }
 
   /* ══════════════════════════════════════════
+     DEFAULT CARD DATA (sample_hecatomb.csv)
+     Loaded automatically when no saved
+     collection exists in localStorage.
+  ══════════════════════════════════════════ */
+  const DEFAULT_CSV = `name,type,doom,cost,strength,subtype,set,abilities,flavor,image,emoji
+Great Cthulhu,God,destruction,5,,Elder God,Base Set,"When Great Cthulhu enters play, deal 3 damage to each opponent's abomination. Continuous: Your destruction minions get +1 strength.","In his house at R'lyeh, dead Cthulhu waits dreaming.",,☠️
+Dagon,God,deceit,4,,Elder God,Base Set,"When Dagon enters play, you may return a minion from your graveyard to your hand. Continuous: Your deceit minions cannot be targeted by opponent's abilities.","Father of the Deep Ones, herald of the outer dark.",,👁️
+Wendigo,Minion,destruction,2,3,Beast,Base Set,Rager (+1): This abomination gets +1 strength while attacking.,"Its hunger is without end — it devours flesh and soul alike.",,🐺
+Night Gaunt,Minion,deceit,1,2,Beast,Base Set,Evader (destruction): Cannot be blocked by destruction abominations.,"Silent and faceless, they serve masters spoken of only in dreams.",,🦇
+Colour Out of Space,Fate,corruption,3,,,Base Set,"Target abomination loses 2 strength until end of turn. If that abomination has 0 or less strength, destroy it.","It was not from any world known to man.",,🌈
+Necronomicon,Relic,corruption,4,,,Base Set,"Tap: Search your deck for a minion with doom Corruption and put it into your hand. Shuffle your deck.","The book of dead names, written in the blood of the damned.",,📖
+Serpent Man,Minion,deceit,2,2,Humanoid,Base Set,"When you play Serpent Man onto an abomination of doom Deceit, draw a card.","They wear the skins of men, but their hearts are cold as scales.",,🐍
+Deep One,Minion,greed,1,1,Aquatic,Base Set,Regenerator: When this minion would be destroyed by combat damage, return it to its owner's hand instead.,"From the depths they rise, hungry and ancient.",,🐟
+Elder Thing,Minion,corruption,3,4,Alien,Base Set,Host: You can only play this minion as a new abomination.,"Older than mankind, older than the Earth itself.",,🦑
+Shoggoth,Minion,destruction,4,6,Beast,Base Set,"When Shoggoth attacks, it deals 1 damage to each of the defender's minions in addition to normal combat damage.","Tekeli-li! Tekeli-li!",,🫧
+Mi-Go Brain Cylinder,Relic,greed,2,,,Base Set,"Tap: Look at the top three cards of your deck. Put one into your hand and the rest on the bottom in any order.","They harvest minds as men harvest wheat.",,🧠
+Hastur,God,deceit,6,,Outer God,Last Hallow's Eve,"When Hastur enters play, each opponent discards two cards. Continuous: At the start of each opponent's turn, they discard a card.","He Who Must Not Be Named waits in Carcosa.",,👑
+The King in Yellow,Fate,deceit,2,,,Last Hallow's Eve,"Target player discards their hand and draws four cards.","When the Yellow Sign is revealed, sanity is forfeit.",,📜
+Black Goat of the Woods,God,corruption,5,,Outer God,Last Hallow's Eve,"When Black Goat of the Woods enters play, put three 1-strength Beast Corruption minion tokens into play. Continuous: Your Beast minions get +1 strength.","A thousand young, and none of them kind.",,🐐
+Flying Polyp,Minion,destruction,3,3,Ancient,Last Hallow's Eve,Guardian: This abomination cannot attack. Nemesis (greed): Cannot be targeted by greed abilities.,"Half-visible horrors from the dawn of time.",,💨
+Yith Mind Swap,Fate,greed,1,,,Last Hallow's Eve,"Gain control of target minion until end of turn. It gains Haste and must attack this turn if able.","They reach across time itself to claim what they desire.",,🧩
+Dimensional Shambler,Minion,deceit,2,2,Alien,Last Hallow's Eve,Fanatic: This abomination can attack even if you played a minion on it this turn.,"It tears holes between worlds with its bare hands.",,🌀
+Cthugha,God,destruction,4,,Flame God,Last Hallow's Eve,"When Cthugha enters play, deal 2 damage to each abomination. Continuous: Fire-based abilities you control deal 1 extra damage.","Living fire from the depths of Fomalhaut.",,🔥
+Grey Alien Scout,Minion,greed,1,1,Alien,Blanket of Lies,"When Grey Alien Scout deals combat damage, look at the top card of that player's deck.","They have watched us since before we learned to count the stars.",,👽
+Men in Black,Minion,deceit,2,2,Humanoid,Blanket of Lies,Nemesis (corruption): Cannot be targeted by corruption abilities. Follower: Cannot be a new abomination.,"They don't exist. That's how you know they're everywhere.",,🕴️
+Cattle Mutilator,Fate,destruction,2,,,Blanket of Lies,"Destroy target 3-strength or less minion. Its controller gains 1 soul.","The evidence is always cleaned up before morning.",,🐄
+Crop Circle Array,Relic,greed,3,,,Blanket of Lies,"Tap: Each opponent with fewer souls than you loses 1 soul.","Messages written in wheat and silence.",,🔵
+Hybrid Cultist,Minion,corruption,1,1,Cultist,Base Set,"When you play Hybrid Cultist onto an abomination, that abomination reaps +1 soul on its next successful attack.","Half-born, half-mad, wholly devoted.",,🧿
+Star Vampire,Minion,greed,2,3,Undead,Base Set,Soulbound: When this minion would be destroyed by combat, you may stitch it onto another of your abominations instead.,"It feeds on stars as well as men.",,🦇`;
+
+  /* ══════════════════════════════════════════
      INIT
   ══════════════════════════════════════════ */
   function init() {
     loadFromStorage();
+
+    // If nothing was saved, load the built-in default card list
+    if (allCards.length === 0) {
+      const { cards } = parseCSV(DEFAULT_CSV);
+      allCards = cards;
+      // Don't save to localStorage so it stays as a "fresh" default
+      // (importing a real CSV will then overwrite it)
+    } else {
+      showToast(`Restored ${allCards.length} cards from last session`, 2800);
+    }
+
     populateSetFilter();
     updateRangeMaxima();
     updateStats();
     renderGallery();
     renderDeck();
-    if (allCards.length)
-      showToast(`Restored ${allCards.length} cards from last session`, 2800);
   }
 
   init();
 })();
-
-/**
- * Loads a CSV file from the same directory as index.html
- * @param {string} fileName - The name of the file (e.g., "cards.csv")
- */
-async function loadLocalCSV(sample) {
-  try {
-    // Fetch the file using its name directly
-    const response = await fetch(fileName);
-
-    if (!response.ok) {
-      throw new Error(`Could not find ${fileName} in the root directory.`);
-    }
-
-    // Convert the file content to the "text" variable your function needs
-    const csvContent = await response.text();
-
-    // Call your existing import function
-    importText(csvContent, fileName);
-  } catch (error) {
-    console.error("Error loading CSV:", error);
-    showToast("Error: " + error.message);
-  }
-}
-
-// To run this immediately when the page loads:
-loadLocalCSV("sample_hecatomb.csv");
